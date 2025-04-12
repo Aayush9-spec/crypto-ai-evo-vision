@@ -26,8 +26,9 @@ const NewsWidget = () => {
     const fetchNews = async () => {
       setIsLoading(true);
       try {
+        // Modified to get general news instead of cryptocurrency news
         const response = await fetch(
-          `http://api.mediastack.com/v1/news?access_key=${API_KEY}&keywords=cryptocurrency,bitcoin,ethereum&limit=4&sort=published_desc`
+          `http://api.mediastack.com/v1/news?access_key=${API_KEY}&languages=en&limit=4&sort=published_desc`
         );
         
         if (!response.ok) {
@@ -64,11 +65,12 @@ const NewsWidget = () => {
   // Helper function to determine category based on article title
   const getCategoryFromKeywords = (title: string): string => {
     const lowerTitle = title.toLowerCase();
-    if (lowerTitle.includes("bitcoin") || lowerTitle.includes("btc")) return "Bitcoin";
-    if (lowerTitle.includes("ethereum") || lowerTitle.includes("eth")) return "Ethereum";
-    if (lowerTitle.includes("regulation") || lowerTitle.includes("law")) return "Regulation";
-    if (lowerTitle.includes("adoption")) return "Adoption";
-    return "Crypto";
+    if (lowerTitle.includes("business") || lowerTitle.includes("economy") || lowerTitle.includes("market")) return "Business";
+    if (lowerTitle.includes("tech") || lowerTitle.includes("technology") || lowerTitle.includes("digital")) return "Technology";
+    if (lowerTitle.includes("politics") || lowerTitle.includes("government") || lowerTitle.includes("election")) return "Politics";
+    if (lowerTitle.includes("health") || lowerTitle.includes("medical") || lowerTitle.includes("covid")) return "Health";
+    if (lowerTitle.includes("sport") || lowerTitle.includes("football") || lowerTitle.includes("olympic")) return "Sports";
+    return "General";
   };
 
   // Format date from API to readable format
@@ -113,7 +115,7 @@ const NewsWidget = () => {
                     </div>
                   </div>
                   <Badge variant="outline" className="text-xs bg-secondary/50 hover:bg-secondary">
-                    {article.category || "Crypto"}
+                    {article.category}
                   </Badge>
                 </div>
               </div>
@@ -135,32 +137,32 @@ const NewsWidget = () => {
 // Fallback news data in case the API fails
 const fallbackNewsData = [
   {
-    title: "Bitcoin Breaks Record High Above $70,000 as Institutional Interest Surges",
-    source: "CryptoNews",
+    title: "Global Climate Summit Reaches Historic Agreement on Emissions",
+    source: "World News Daily",
     published_at: "2025-04-12T10:30:00Z",
     url: "#",
-    category: "Bitcoin",
+    category: "Politics",
   },
   {
-    title: "ETH 2.0 Upgrade to Unlock New Scaling Solutions",
-    source: "Blockchain Daily",
+    title: "Tech Giant Unveils Revolutionary AI Assistant for Healthcare",
+    source: "Tech Today",
     published_at: "2025-04-11T14:15:00Z",
     url: "#",
-    category: "Ethereum",
+    category: "Technology",
   },
   {
-    title: "US Regulators Announce New Framework for Crypto Assets",
+    title: "World Economy Shows Signs of Recovery After Pandemic",
     source: "Finance Today",
     published_at: "2025-04-10T08:45:00Z",
     url: "#",
-    category: "Regulation",
+    category: "Business",
   },
   {
-    title: "Major Bank Adds Bitcoin to Balance Sheet in $200M Purchase",
-    source: "Market Watch",
+    title: "Olympic Committee Announces Host City for 2036 Games",
+    source: "Sports Network",
     published_at: "2025-04-09T16:20:00Z",
     url: "#",
-    category: "Adoption",
+    category: "Sports",
   },
 ];
 
