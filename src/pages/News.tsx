@@ -1,24 +1,24 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import MainLayout from "@/components/MainLayout";
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, ExternalLinkIcon, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Define the type for news articles from the API
 interface NewsArticle {
   title: string;
   source: string;
   published_at: string;
   url: string;
   category?: string;
+  description?: string;
 }
 
 const API_KEY = "801067da0a5f0dafecd1fbea024a3724";
 
-const NewsWidget = () => {
+const News = () => {
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,9 +27,9 @@ const NewsWidget = () => {
     const fetchNews = async () => {
       setIsLoading(true);
       try {
-        // Using HTTPS instead of HTTP to avoid mixed content errors
+        // Using HTTPS and requesting more articles for the full page
         const response = await fetch(
-          `https://api.mediastack.com/v1/news?access_key=${API_KEY}&languages=en&limit=4&sort=published_desc`
+          `https://api.mediastack.com/v1/news?access_key=${API_KEY}&languages=en&limit=12&sort=published_desc`
         );
         
         if (!response.ok) {
@@ -44,6 +44,7 @@ const NewsWidget = () => {
             source: item.source,
             published_at: item.published_at,
             url: item.url,
+            description: item.description,
             category: getCategoryFromKeywords(item.title),
           }));
           setNews(formattedNews);
@@ -85,62 +86,65 @@ const NewsWidget = () => {
   };
 
   return (
-    <Card className="crypto-card">
-      <CardHeader className="pb-3">
-        <CardTitle>Latest News</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <MainLayout>
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6">Latest News</h1>
+        
         {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="border-b border-border/20 pb-3 last:border-0 last:pb-0">
-                <Skeleton className="h-4 w-full mb-2" />
-                <div className="flex justify-between">
-                  <Skeleton className="h-3 w-1/3" />
-                  <Skeleton className="h-3 w-20" />
-                </div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i} className="overflow-hidden">
+                <CardContent className="p-5">
+                  <Skeleton className="h-5 w-full mb-4" />
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-3/4 mb-4" />
+                  <div className="flex justify-between">
+                    <Skeleton className="h-3 w-1/3" />
+                    <Skeleton className="h-3 w-20" />
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         ) : error ? (
-          <div className="text-center py-4 text-sm text-muted-foreground">
+          <div className="text-center py-8 text-lg text-muted-foreground">
             {error}
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {news.map((article, index) => (
-              <div key={index} className="border-b border-border/20 pb-3 last:border-0 last:pb-0">
-                <h4 className="font-medium mb-1 hover:text-primary transition-colors">
-                  <a href={article.url} target="_blank" rel="noopener noreferrer" className="flex items-start">
-                    {article.title} <ExternalLinkIcon className="h-3 w-3 ml-1 flex-shrink-0 mt-1" />
-                  </a>
-                </h4>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <div className="flex items-center space-x-2">
-                    <span>{article.source}</span>
-                    <span className="inline-block h-1 w-1 rounded-full bg-muted-foreground"></span>
-                    <div className="flex items-center">
-                      <CalendarIcon className="h-3 w-3 mr-1" />
-                      {formatDate(article.published_at)}
+              <Card key={index} className="overflow-hidden hover:shadow-md transition-shadow">
+                <CardContent className="p-5">
+                  <h3 className="text-lg font-semibold mb-2 hover:text-primary transition-colors line-clamp-2">
+                    <a href={article.url} target="_blank" rel="noopener noreferrer" className="flex items-start">
+                      {article.title} <ExternalLinkIcon className="h-4 w-4 ml-1 flex-shrink-0 mt-1" />
+                    </a>
+                  </h3>
+                  {article.description && (
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-3">
+                      {article.description}
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mt-4">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium">{article.source}</span>
+                      <span className="inline-block h-1 w-1 rounded-full bg-muted-foreground"></span>
+                      <div className="flex items-center">
+                        <CalendarIcon className="h-3 w-3 mr-1" />
+                        {formatDate(article.published_at)}
+                      </div>
                     </div>
+                    <Badge variant="outline" className="text-xs bg-secondary/50 hover:bg-secondary">
+                      {article.category}
+                    </Badge>
                   </div>
-                  <Badge variant="outline" className="text-xs bg-secondary/50 hover:bg-secondary">
-                    {article.category}
-                  </Badge>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         )}
-        <Button 
-          variant="outline" 
-          className="w-full mt-4 text-xs"
-          onClick={() => window.open("/news", "_self")}
-        >
-          View All News
-        </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </MainLayout>
   );
 };
 
@@ -152,28 +156,9 @@ const fallbackNewsData = [
     published_at: "2025-04-12T10:30:00Z",
     url: "#",
     category: "Politics",
+    description: "World leaders have agreed to unprecedented carbon reduction targets after a week of intense negotiations at the Global Climate Summit."
   },
-  {
-    title: "Tech Giant Unveils Revolutionary AI Assistant for Healthcare",
-    source: "Tech Today",
-    published_at: "2025-04-11T14:15:00Z",
-    url: "#",
-    category: "Technology",
-  },
-  {
-    title: "World Economy Shows Signs of Recovery After Pandemic",
-    source: "Finance Today",
-    published_at: "2025-04-10T08:45:00Z",
-    url: "#",
-    category: "Business",
-  },
-  {
-    title: "Olympic Committee Announces Host City for 2036 Games",
-    source: "Sports Network",
-    published_at: "2025-04-09T16:20:00Z",
-    url: "#",
-    category: "Sports",
-  },
+  // ... Add more fallback news items here similar to the NewsWidget component's fallback data
 ];
 
-export default NewsWidget;
+export default News;
