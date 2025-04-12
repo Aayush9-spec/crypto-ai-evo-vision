@@ -1,13 +1,32 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import MainLayout from "@/components/MainLayout";
+import PriceChart from "@/components/dashboard/PriceChart";
+import MarketOverview from "@/components/dashboard/MarketOverview";
+import AIInsights from "@/components/dashboard/AIInsights";
+import NewsWidget from "@/components/dashboard/NewsWidget";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <MainLayout>
+      <div className="grid grid-cols-12 gap-6">
+        <div className="col-span-12 lg:col-span-8">
+          <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+          <div className="space-y-6">
+            <PriceChart />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <AIInsights />
+              <NewsWidget />
+            </div>
+          </div>
+        </div>
+        <div className="col-span-12 lg:col-span-4">
+          <div className="sticky top-6">
+            <h2 className="text-lg font-semibold mb-4">Markets</h2>
+            <MarketOverview />
+          </div>
+        </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 
