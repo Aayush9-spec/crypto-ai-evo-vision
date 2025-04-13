@@ -17,41 +17,57 @@ const useSpeechRecognition = (): SpeechRecognitionHook => {
   const [recognition, setRecognition] = useState<any | null>(null);
 
   // Check if browser supports speech recognition
-  const hasRecognitionSupport = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+  const hasRecognitionSupport = typeof window !== 'undefined' && 
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
+  // Initialize speech recognition
   useEffect(() => {
     if (!hasRecognitionSupport) return;
 
-    // Initialize speech recognition
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognitionInstance = new SpeechRecognition();
+    let recognitionInstance: any;
     
-    recognitionInstance.continuous = false;
-    recognitionInstance.interimResults = false;
-    recognitionInstance.lang = 'en-US';
+    try {
+      // Initialize speech recognition
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionInstance = new SpeechRecognition();
+      
+      recognitionInstance.continuous = false;
+      recognitionInstance.interimResults = false;
+      recognitionInstance.lang = 'en-US';
 
-    recognitionInstance.onresult = (event: any) => {
-      const currentTranscript = event.results[0][0].transcript;
-      setTranscript(currentTranscript);
-      setIsListening(false);
-    };
+      recognitionInstance.onresult = (event: any) => {
+        const currentTranscript = event.results[0][0].transcript;
+        setTranscript(currentTranscript);
+        setIsListening(false);
+      };
 
-    recognitionInstance.onerror = (event: any) => {
-      setError(`Speech recognition error: ${event.error}`);
-      setIsListening(false);
-    };
+      recognitionInstance.onerror = (event: any) => {
+        setError(`Speech recognition error: ${event.error}`);
+        setIsListening(false);
+      };
 
-    recognitionInstance.onend = () => {
-      setIsListening(false);
-    };
+      recognitionInstance.onend = () => {
+        setIsListening(false);
+      };
 
-    setRecognition(recognitionInstance);
+      setRecognition(recognitionInstance);
+    } catch (err) {
+      console.error("Error initializing speech recognition:", err);
+      setError("Failed to initialize speech recognition");
+    }
 
     return () => {
-      if (recognition) {
-        recognition.onresult = null;
-        recognition.onend = null;
-        recognition.onerror = null;
+      if (recognitionInstance) {
+        try {
+          recognitionInstance.onresult = null;
+          recognitionInstance.onend = null;
+          recognitionInstance.onerror = null;
+          if (isListening) {
+            recognitionInstance.stop();
+          }
+        } catch (err) {
+          console.error("Error cleaning up speech recognition:", err);
+        }
       }
     };
   }, [hasRecognitionSupport]);
