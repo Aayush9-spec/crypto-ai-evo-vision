@@ -146,7 +146,7 @@ const Indicators = () => {
       case "rsi":
         return (
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
+            <RechartsLineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
               <XAxis dataKey="time" />
               <YAxis domain={[0, 100]} />
@@ -161,14 +161,14 @@ const Indicators = () => {
                 dot={false}
                 strokeWidth={2}
               />
-            </LineChart>
+            </RechartsLineChart>
           </ResponsiveContainer>
         );
       
       case "macd":
         return (
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
+            <RechartsLineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
               <XAxis dataKey="time" />
               <YAxis />
@@ -191,7 +191,7 @@ const Indicators = () => {
                 strokeWidth={2}
               />
               <ReferenceLine y={0} stroke="#374151" strokeDasharray="3 3" />
-            </LineChart>
+            </RechartsLineChart>
           </ResponsiveContainer>
         );
       
