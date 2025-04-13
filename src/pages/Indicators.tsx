@@ -336,11 +336,11 @@ const Indicators = () => {
                     <div className="text-sm flex items-center gap-3">
                       <div className="flex items-center gap-1">
                         <span className="inline-block w-3 h-3 bg-red-500 rounded-full"></span>
-                        <span>Overbought (>70)</span>
+                        <span>Overbought (&gt;70)</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <span className="inline-block w-3 h-3 bg-green-500 rounded-full"></span>
-                        <span>Oversold (<30)</span>
+                        <span>Oversold (&lt;30)</span>
                       </div>
                     </div>
                   )}
