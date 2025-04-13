@@ -5,11 +5,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { BrainCircuitIcon, ChartBarIcon, TrendingUpIcon, MicIcon, SendIcon, Loader2Icon } from "lucide-react";
 import { queryGorqAI, extractInvestmentAdvice } from "@/utils/gorqApi";
 import useSpeechRecognition from "@/hooks/useSpeechRecognition";
+import { useToast } from "@/hooks/use-toast";
 
 const sentimentData = [
   {
@@ -61,13 +61,19 @@ interface ChatMessage {
   } | null;
 }
 
-const AIInsights = () => {
+interface AIInsightsProps {
+  openFromSidebar?: boolean;
+  onClose?: () => void;
+}
+
+const AIInsights = ({ openFromSidebar = false, onClose }: AIInsightsProps) => {
   const [activeTab, setActiveTab] = useState("sentiment");
   const [query, setQuery] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
   
   // Voice recognition
   const { 
@@ -77,6 +83,20 @@ const AIInsights = () => {
     stopListening,
     hasRecognitionSupport 
   } = useSpeechRecognition();
+
+  // Effect to handle opening the chat from the sidebar
+  useEffect(() => {
+    if (openFromSidebar) {
+      setIsChatOpen(true);
+    }
+  }, [openFromSidebar]);
+
+  // Effect to call onClose when dialog is closed
+  useEffect(() => {
+    if (!isChatOpen && onClose) {
+      onClose();
+    }
+  }, [isChatOpen, onClose]);
 
   // Set transcript as query when speech recognition completes
   useEffect(() => {
@@ -128,6 +148,12 @@ const AIInsights = () => {
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error("Error querying AI:", error);
+      
+      toast({
+        title: "API Connection Error",
+        description: "Unable to connect to the AI service. Please try again later.",
+        variant: "destructive"
+      });
       
       // Add error message
       const errorMessage: ChatMessage = {
@@ -231,7 +257,10 @@ const AIInsights = () => {
         </CardContent>
       </Card>
       
-      <Dialog open={isChatOpen} onOpenChange={setIsChatOpen}>
+      <Dialog open={isChatOpen} onOpenChange={(open) => {
+        setIsChatOpen(open);
+        if (!open && onClose) onClose();
+      }}>
         <DialogContent className="sm:max-w-[500px] max-h-[80vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
