@@ -95,21 +95,12 @@ const AIInsights = ({ openFromSidebar = false, onClose }: AIInsightsProps) => {
   }, [isChatOpen, onClose]);
 
   useEffect(() => {
-    if (transcript && !isListening) {
-      setQuery(transcript);
-      if (transcript.length > 5) {
-        handleSubmit(transcript);
-      }
-    }
-  }, [transcript, isListening]);
-
-  useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
-  const handleSubmit = async (text = query) => {
+  const handleSendMessage = async (text: string) => {
     if (!text.trim()) return;
     
     const userMessage: ChatMessage = {
@@ -120,8 +111,6 @@ const AIInsights = ({ openFromSidebar = false, onClose }: AIInsightsProps) => {
     };
     
     setMessages((prev) => [...prev, userMessage]);
-    setIsLoading(true);
-    setQuery('');
     
     try {
       const response = await queryGorqAI(text);
@@ -153,8 +142,6 @@ const AIInsights = ({ openFromSidebar = false, onClose }: AIInsightsProps) => {
       };
       
       setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -273,10 +260,7 @@ const AIInsights = ({ openFromSidebar = false, onClose }: AIInsightsProps) => {
                       variant="outline"
                       size="sm"
                       className="text-left"
-                      onClick={() => {
-                        setQuery(suggestion);
-                        handleSubmit(suggestion);
-                      }}
+                      onClick={() => handleSendMessage(suggestion)}
                     >
                       {suggestion}
                     </Button>
@@ -324,36 +308,17 @@ const AIInsights = ({ openFromSidebar = false, onClose }: AIInsightsProps) => {
           </div>
           
           <div className="border-t pt-4">
-            <form 
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSubmit();
-              }}
-              className="flex gap-2"
-            >
-              <Input 
-                placeholder="Ask about crypto markets or investments..." 
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                disabled={isLoading}
-                className="flex-1"
-              />
-              {hasRecognitionSupport && (
-                <Button 
-                  type="button"
-                  size="icon"
-                  variant={isListening ? "default" : "outline"}
-                  onClick={() => isListening ? stopListening() : startListening()}
-                  disabled={isLoading}
-                  className={isListening ? "animate-pulse bg-primary" : ""}
-                >
-                  <MicIcon className="h-4 w-4" />
-                </Button>
+            <div className="flex gap-2">
+              {messages.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Select a suggestion or type your query</p>
+              ) : (
+                <div className="w-full text-center">
+                  <Button onClick={() => setMessages([])}>
+                    Clear Conversation
+                  </Button>
+                </div>
               )}
-              <Button type="submit" size="icon" disabled={!query.trim() || isLoading}>
-                {isLoading ? <Loader2Icon className="h-4 w-4 animate-spin" /> : <SendIcon className="h-4 w-4" />}
-              </Button>
-            </form>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
