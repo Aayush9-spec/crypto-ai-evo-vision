@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -75,7 +74,6 @@ const AIInsights = ({ openFromSidebar = false, onClose }: AIInsightsProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
-  // Voice recognition
   const { 
     transcript, 
     isListening, 
@@ -84,32 +82,27 @@ const AIInsights = ({ openFromSidebar = false, onClose }: AIInsightsProps) => {
     hasRecognitionSupport 
   } = useSpeechRecognition();
 
-  // Effect to handle opening the chat from the sidebar
   useEffect(() => {
     if (openFromSidebar) {
       setIsChatOpen(true);
     }
   }, [openFromSidebar]);
 
-  // Effect to call onClose when dialog is closed
   useEffect(() => {
     if (!isChatOpen && onClose) {
       onClose();
     }
   }, [isChatOpen, onClose]);
 
-  // Set transcript as query when speech recognition completes
   useEffect(() => {
     if (transcript && !isListening) {
       setQuery(transcript);
-      // Auto submit if we have a transcript and enough characters
       if (transcript.length > 5) {
         handleSubmit(transcript);
       }
     }
   }, [transcript, isListening]);
 
-  // Scroll to bottom of chat when messages change
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -119,7 +112,6 @@ const AIInsights = ({ openFromSidebar = false, onClose }: AIInsightsProps) => {
   const handleSubmit = async (text = query) => {
     if (!text.trim()) return;
     
-    // Add user message
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       type: 'user',
@@ -132,11 +124,9 @@ const AIInsights = ({ openFromSidebar = false, onClose }: AIInsightsProps) => {
     setQuery('');
     
     try {
-      // Get response from Gorq AI
       const response = await queryGorqAI(text);
       const investmentAdvice = extractInvestmentAdvice(response.text);
       
-      // Add assistant message
       const assistantMessage: ChatMessage = {
         id: response.id || `assistant-${Date.now()}`,
         type: 'assistant',
@@ -155,7 +145,6 @@ const AIInsights = ({ openFromSidebar = false, onClose }: AIInsightsProps) => {
         variant: "destructive"
       });
       
-      // Add error message
       const errorMessage: ChatMessage = {
         id: `error-${Date.now()}`,
         type: 'assistant',
