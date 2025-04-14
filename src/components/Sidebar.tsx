@@ -60,16 +60,16 @@ const Sidebar = () => {
               active={currentPath === "/"}
             />
             <SidebarItem
-              icon={<TrendingUpIcon className="h-5 w-5" />}
-              label="Markets"
-              to="/markets"
-              active={currentPath === "/markets"}
-            />
-            <SidebarItem
               icon={<WalletIcon className="h-5 w-5" />}
               label="Portfolio"
               to="/portfolio"
               active={currentPath === "/portfolio"}
+            />
+            <SidebarItem
+              icon={<TrendingUpIcon className="h-5 w-5" />}
+              label="Markets"
+              to="/markets"
+              active={currentPath === "/markets"}
             />
           </div>
         </div>
