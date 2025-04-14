@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -64,12 +65,6 @@ const Sidebar = () => {
               label="Portfolio"
               to="/portfolio"
               active={currentPath === "/portfolio"}
-            />
-            <SidebarItem
-              icon={<TrendingUpIcon className="h-5 w-5" />}
-              label="Markets"
-              to="/markets"
-              active={currentPath === "/markets"}
             />
           </div>
         </div>
@@ -140,7 +135,23 @@ const Sidebar = () => {
           </div>
         </div>
         
-        <div className="mt-auto px-3 py-4">
+        <div className="mt-auto px-3">
+          <div className="px-3 py-2">
+            <h3 className="mb-2 px-4 text-xs font-medium uppercase text-muted-foreground">
+              Markets
+            </h3>
+            <div className="space-y-1">
+              <SidebarItem
+                icon={<TrendingUpIcon className="h-5 w-5" />}
+                label="Markets"
+                to="/markets"
+                active={currentPath === "/markets"}
+              />
+            </div>
+          </div>
+        </div>
+        
+        <div className="px-3 py-4">
           <div className="crypto-card overflow-hidden">
             <div className="px-4 py-3 bg-primary/20">
               <div className="flex items-center">
